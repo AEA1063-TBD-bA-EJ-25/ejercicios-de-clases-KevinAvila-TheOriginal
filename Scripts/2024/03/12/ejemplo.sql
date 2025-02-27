@@ -2,5 +2,3 @@ select
     * 
 from
     -- tables
-
-    
