@@ -1,8 +1,8 @@
 CREATE DATABASE escuelita;
 
-go
+go;
 
-use escuelita
+use escuelita;
 
 create TABLE persona (
     CURP CHAR(18) NOT NULL PRIMARY KEY,
@@ -18,7 +18,7 @@ CREATE TABLE Carrera (
 )
 
 CREATE TABLE Alumno (
-    CURP CHAR(18) NOT NULL PRIMARY KEY FOREIGN Key REFERENCES persona(CURP), 
+    CURP CHAR(18) NOT NULL PRIMARY KEY FOREIGN Key REFERENCES Persona(CURP), 
     NumeroDeControl CHAR(8) NOT NULL UNIQUE,
     ClaveCarrera CHAR(13) FOREIGN Key REFERENCES Carrera (Clave)
 
@@ -30,12 +30,12 @@ CREATE TABLE Docente (
     CURP        CHAR(18) NOT NULL PRIMARY KEY,
     RFC         CHAR(13) NOT NULL UNIQUE,
     Profesion   NVARCHAR(30) NULL,
-    FOREIGN KEY (CURP) REFERENCES persona(CURP)
+    FOREIGN KEY (CURP) REFERENCES Persona(CURP)
 )
 
 CREATE TABLE Administratvo (
     CURP CHAR(18) NOT NULL 
-    PRIMARY KEY FOREIGN Key REFERENCES persona(CURP), 
+    PRIMARY KEY FOREIGN Key REFERENCES Persona(CURP), 
 )
 
 INSERT INTO Carrera (Clave, Nombre)
@@ -47,28 +47,133 @@ INSERT INTO Carrera (Clave, Nombre)
     VALUES  ('ISIC-2010-224', 'Ingeniería en Sistemas Computacionales'),
             ('IMCT-2010-229', 'Ingeniería Mecatrónica')
 
-insert into persona (CURP, Nombre, Direccion, Nacimiento)
+insert into Persona (CURP, Nombre, Direccion, Nacimiento)
     VALUES ('JS20FR', 'Johane Sacrebleu', 'Por allá', '2003-04-05')
 
 INSERT into Alumno(CURP, NumeroDeControl, ClaveCarrera)
     VALUES ('JS20FR', '20170005', 'ITIC-2010-225')
 
-    select NumeroDeControl, Nombre, ClaveCarrera  from persona
+    select NumeroDeControl, Nombre, ClaveCarrera  from Persona
         join Alumno on Persona.CURP = Alumno.CURP
     select * from Alumno
- 
 
- create TABLE malapersona (
-    idpersona int not null IDENTITY PRIMARY KEY,
-    CURP CHAR(18) NOT NULL UNIQUE,
+    create TABLE MalaPersona (
+    idPersona int not null IDENTITY Primary Key,
+    CURP CHAR(18) NOT NULL,
     Nombre nvarchar(50) NOT NULL,
     Direccion NVARCHAR(100)NULL,
     Nacimiento DATE NOT NULL,
 )
 
-insert into malapersona (CURP, Nombre, Direccion, Nacimiento)
+insert into MalaPersona (CURP, Nombre, Direccion, Nacimiento)
     VALUES ('JS20FR', 'Johane Sacrebleu', 'Por allá', '2003-04-05')
 
-SELECT * FROM malapersona
+    select * from MalaPersona
 
-DROP TABLE malapersona
+    drop table MalaPersona
+
+create table empleado(
+    idEmpleado int not null PRIMARY KEY,
+    nombre NVARCHAR(50)NOT NULL,
+    sueldo money DEFAULT 1500
+)
+
+insert into empleado (idEmpleado, nombre, sueldo)
+    values (1, 'Felipe de jesus', 2000)
+
+select * from empleado;
+
+insert into empleado(idEmpleado, nombre)
+    Values (2, 'Chuerk')
+
+SELECT * from empleado;
+
+create table personita(
+    idEmpledo int not null PRIMARY KEY,
+    nombre NVARCHAR(50)NOT NULL,
+    sueldo money DEFAULT 1500,
+    telefono varchar(20) check ( telefono like '667[0-9][0-9][0-9]')
+)
+
+insert into personita values (1, 'Juana', null, '667123')
+
+alter table empleado
+    add sexo char(1) null check (sexo in ('M','H'))
+
+insert into empleado  (idEmpleado, nombre, sexo)values (3, 'Alexis Jara Rodriguez','R')
+insert into empleado  (idEmpleado, nombre, sexo)values (4, 'Matilde Sandoval','F')
+
+
+    select * from empleado;
+    select * from personita;
+
+    alter table empleado
+        drop CONSTRAINT CK__empleado__sexo__3F466844
+
+    insert into empleado (idEmpleado, nombre, sexo) values (5, 'Refugio Saldivar', 'F')
+
+    insert into empleado (idEmpleado, nombre, sexo) values (6, 'Delia Barantes', 'R')
+
+    alter TABLE empleado
+        add nacimiento date not null 
+
+    alter table empleado
+        add RFC char(13) NULL
+
+    alter table empleado
+        add CONSTRAINT rfc_unico unique(RFC) 
+       -- check ( date < getDate)
+
+    update empleado
+        set RFC = 'CCC555'
+        where idEmpledo = 5
+
+    select * from empleado
+
+    insert into empleado (idEmpledo, nombre, sexo, rfc) values (6, 'Refugio Saldivar', 'F', 'CCC555')
+
+    create table Departamento (
+        idDepartamento int not null primary key,
+        Nombre nvarchar(30)
+    )
+
+    insert into Departamento (idDepartamento, Nombre)
+        values (1, 'ventas'), (2, 'MKT'), (3, 'TIC')
+
+    select * from Departamento
+
+    alter table empleado
+        add TrabajaEn int null FOREIGN key references departamento (idDepartamento) 
+
+    select * from empleado
+
+    update empleado
+        set TrabajaEn = 3
+        where idEmpledo = 4
+
+        delete from Departamento
+        where idDepartamento = 2
+
+
+alter table empleado
+drop CONSTRAINT fk__empleado__Trabaj__412EB2B6
+
+ALTER TABLE fk__empleado__TrabajaEn FOREIGN KEY (TrabajaEn) REFERENCES Departamento(idDepartamento)
+on delete set NULL
+delete from Departamento
+where idDepartamento = 2
+SELECT * from empleado
+
+CREATE TABLE Familiares (
+    nombre NVARCHAR(50) not null,
+    idEmpleado int not null FOREIGN KEY REFERENCES empleado(idEmpleado) on DELETE cascade
+
+)
+
+INSERT into Familiares (nombre, idEmpleado)
+values('Gertrudis', 1), ('Daniela', 1), ('Manuel', 2)
+
+select * from empleado 
+select from Familiares
+
+delete from empleado 
